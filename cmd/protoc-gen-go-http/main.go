@@ -7,6 +7,9 @@ import (
 	"google.golang.org/protobuf/types/pluginpb"
 )
 
+// 1. cd cmd/protoc-gen-go-http
+// 2. go install main.go http.go template.go
+// 3. mv main.exe protoc-gen-go-http(in GOPATH/bin)
 
 func main() {
 	var flags flag.FlagSet

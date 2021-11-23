@@ -7,12 +7,12 @@ import (
 )
 
 var tpl = `
-type {{ $.Name }}HTTP interface {
+type {{ $.Name }}HTTPServer interface {
 {{range .MethodSet}}
 	{{.Name}}(context.Context, *{{.Request}}) (*{{.Reply}}, error)
 {{end}}
 }
-func Register{{ $.Name }}(r gin.IRouter, srv {{ $.Name }}) {
+func Register{{ $.Name }}HTTPServer(r gin.IRouter, srv {{ $.Name }}) {
 	s := {{.Name}}{
 		server: srv,
 		router:     r,
@@ -29,7 +29,7 @@ type {{$.Name}} struct{
 {{range .Methods}}
 func (s *{{$.Name}}) {{ .Name }} (ctx *gin.Context) {
 	var in {{.Request}}
-	if err := ctx.BindJson(&in); err != nil {
+	if err := ctx.BindJSON(&in); err != nil {
 		return
 	}
 	out, err := s.server.({{ $.Name }}).{{.Name}}(ctx, &in)

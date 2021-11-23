@@ -1,8 +1,11 @@
 syntax = "proto3";
 
+// protoc -I=api --go_out=api --go_opt=paths=source_relative .\api\blog\v1\blog.proto
+// protoc -I=api --go-http_out=api --go-http_opt=paths=source_relative .\api\blog\v1\blog.proto
+
 package blog.api.v1;
 
-option go_package = "github.com/pb-demo/api/blog/api/v1;v1";
+option go_package = "github.com/sunyuan300/pb-demo/api/blog/api/v1;v1";
 
 import "google/api/annotations.proto";
 

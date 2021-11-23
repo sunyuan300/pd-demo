@@ -12,7 +12,7 @@ import (
 // context.metadata.
 //gin.errors.
 
-type BlogServiceHTTP interface {
+type BlogServiceHTTPServer interface {
 	CreateArticle(context.Context, *CreateArticleRequest) (*CreateArticleReply, error)
 
 	DeleteArticle(context.Context, *DeleteArticleRequest) (*DeleteArticleReply, error)
@@ -24,7 +24,7 @@ type BlogServiceHTTP interface {
 	UpdateArticle(context.Context, *UpdateArticleRequest) (*UpdateArticleReply, error)
 }
 
-func RegisterBlogService(r gin.IRouter, srv BlogService) {
+func RegisterBlogServiceHTTPServer(r gin.IRouter, srv BlogService) {
 	s := BlogService{
 		server: srv,
 		router: r,
@@ -50,7 +50,7 @@ func (s *BlogService) CreateArticle(ctx *gin.Context) {
 
 func (s *BlogService) UpdateArticle(ctx *gin.Context) {
 	var in UpdateArticleRequest
-	if err := ctx.BindJson(&in); err != nil {
+	if err := ctx.BindJSON(&in); err != nil {
 		return
 	}
 	out, err := s.server.(BlogService).UpdateArticle(ctx, &in)
@@ -61,7 +61,7 @@ func (s *BlogService) UpdateArticle(ctx *gin.Context) {
 
 func (s *BlogService) DeleteArticle(ctx *gin.Context) {
 	var in DeleteArticleRequest
-	if err := ctx.BindJson(&in); err != nil {
+	if err := ctx.BindJSON(&in); err != nil {
 		return
 	}
 	out, err := s.server.(BlogService).DeleteArticle(ctx, &in)
@@ -72,7 +72,7 @@ func (s *BlogService) DeleteArticle(ctx *gin.Context) {
 
 func (s *BlogService) GetArticle(ctx *gin.Context) {
 	var in GetArticleRequest
-	if err := ctx.BindJson(&in); err != nil {
+	if err := ctx.BindJSON(&in); err != nil {
 		return
 	}
 	out, err := s.server.(BlogService).GetArticle(ctx, &in)
@@ -83,7 +83,7 @@ func (s *BlogService) GetArticle(ctx *gin.Context) {
 
 func (s *BlogService) ListArticle(ctx *gin.Context) {
 	var in ListArticleRequest
-	if err := ctx.BindJson(&in); err != nil {
+	if err := ctx.BindJSON(&in); err != nil {
 		return
 	}
 	out, err := s.server.(BlogService).ListArticle(ctx, &in)
