@@ -10,6 +10,7 @@ import (
 const (
 	contextPkg         = protogen.GoImportPath("context")
 	ginPkg             = protogen.GoImportPath("github.com/gin-gonic/gin")
+	httpPkg             = protogen.GoImportPath("net/http")
 	errPkg             = protogen.GoImportPath("errors")
 	metadataPkg        = protogen.GoImportPath("google.golang.org/grpc/metadata")
 	deprecationComment = "// Deprecated: Do not use."
@@ -28,8 +29,9 @@ func generateFile(gen *protogen.Plugin, file *protogen.File) *protogen.Generated
 	g.P()
 	g.P("package ", file.GoPackageName)
 	g.P()
-	g.P("// ", contextPkg.Ident(""), metadataPkg.Ident(""))
-	g.P("//", ginPkg.Ident(""), errPkg.Ident(""))
+	g.P("// ", contextPkg.Ident(""), ginPkg.Ident(""),httpPkg.Ident(""))
+	//g.P("// ", contextPkg.Ident(""), metadataPkg.Ident(""))
+	//g.P("//", ginPkg.Ident(""), errPkg.Ident(""))
 	g.P()
 
 	// 遍历每个proto文件的service

@@ -8,42 +8,43 @@ import (
 
 var tpl = `
 type {{ $.Name }}HTTPServer interface {
-{{range .MethodSet}}
-	{{.Name}}(context.Context, *{{.Request}}) (*{{.Reply}}, error)
+{{range .Methods}}
+   {{.Name}}(context.Context, *{{.Request}}) (*{{.Reply}}, error)
 {{end}}
 }
-func Register{{ $.Name }}HTTPServer(r gin.IRouter, srv {{ $.Name }}) {
-	s := {{.Name}}{
-		server: srv,
-		router:     r,
-	}
-	s.RegisterService()
+func Register{{ $.Name }}HTTPServer(group *gin.RouterGroup, srv {{ $.Name }}HTTPServer) {
+{{range .Methods}}
+   group.Handle("{{.Method}}","{{.Path}}",_{{ $.Name }}_{{.Name}}_HTTP_Handler(srv))
+{{end}}
 }
-
-type {{$.Name}} struct{
-	server {{ $.Name }}
-	router gin.IRouter
-}
-
 
 {{range .Methods}}
-func (s *{{$.Name}}) {{ .Name }} (ctx *gin.Context) {
-	var in {{.Request}}
-	if err := ctx.BindJSON(&in); err != nil {
-		return
-	}
-	out, err := s.server.({{ $.Name }}).{{.Name}}(ctx, &in)
-	if err != nil {
-		return
-	}
+func _{{ $.Name }}_{{.Name}}_HTTP_Handler(srv {{ $.Name }}HTTPServer) func(ctx *gin.Context) {
+   return func(ctx *gin.Context) {
+      var in {{.Request}}
+   {{if .HasPathParams }}
+      if err := ctx.ShouldBindUri(&in); err != nil {
+         return
+      }
+   {{end}}
+   {{if eq .Method "GET" "DELETE" }}
+      if err := ctx.ShouldBindQuery(&in); err != nil {
+         return
+      }
+   {{else if eq .Method "POST" "PUT" }}
+      if err := ctx.ShouldBindJSON(&in); err != nil {
+         return
+      }
+   {{end}}
+      out,err := srv.{{.Name}}(ctx,&in)
+      if err != nil {
+         return
+      }
+      ctx.JSON(http.StatusOK,out)
+   }
 }
 {{end}}
 
-func (s *{{$.Name}}) RegisterService() {
-{{range .Methods}}
-		s.router.Handle("{{.Method}}", "{{.Path}}", s.{{ .Name }})
-{{end}}
-}
 `
 
 type Service struct {
@@ -84,4 +85,14 @@ type Method struct {
 	Method       string // HTTP Method
 	Body         string
 	ResponseBody string
+}
+
+func (m *Method) HasPathParams() bool {
+	paths := strings.Split(m.Path, "/")
+	for _, p := range paths {
+		if len(p) > 0 && (p[0] == '{' && p[len(p)-1] == '}' || p[0] == ':') {
+			return true
+		}
+	}
+	return false
 }
